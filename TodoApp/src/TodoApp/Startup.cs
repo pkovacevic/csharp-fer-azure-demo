@@ -19,6 +19,8 @@ namespace TodoApp
 {
     public class Startup
     {
+        private bool _isDevelopment;
+
         public Startup(IHostingEnvironment env)
         {
             var builder = new ConfigurationBuilder()
@@ -34,7 +36,7 @@ namespace TodoApp
 
             builder.AddEnvironmentVariables();
             Configuration = builder.Build();
-        
+            _isDevelopment = env.IsDevelopment();
         }
 
         public IConfigurationRoot Configuration { get; }
@@ -59,7 +61,10 @@ namespace TodoApp
 
             services.AddMvc(options =>
             {
-                options.SslPort = 44397;
+                if (_isDevelopment)
+                {
+                    options.SslPort = 44397;
+                }
                 options.Filters.Add(new RequireHttpsAttribute());
             });
 
@@ -85,12 +90,12 @@ namespace TodoApp
                 app.UseExceptionHandler("/Home/Error");
             }
 
-   
+
             app.UseStaticFiles();
 
             app.UseIdentity();
 
-          
+
 
             app.UseSession();
 
